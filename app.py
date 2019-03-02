@@ -5,7 +5,7 @@ import re
 import os
 
 
-def generate_event(row):
+def generate_event_from_row(row):
     current_event = Event()
     try:
         current_event.id = row.find('td', {'class': 'nums'}).text.replace('\n', '')
@@ -42,7 +42,7 @@ def generate_list_of_events_from_page(page):
     listOfEvents = []
     for counter in range(howmany):
         row = table[counter]
-        event = generate_event(row)
+        event = generate_event_from_row(row)
         listOfEvents.append(event)
     return listOfEvents
 
