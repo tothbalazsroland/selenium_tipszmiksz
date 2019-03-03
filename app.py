@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
+from selenium.webdriver.common.by import By
 import re
 import os
 
@@ -64,9 +65,6 @@ class Event:
         print "Vendeg: " + self.foreign
 
 
-
-
-
 browser = webdriver.Firefox()
 browser.get('http://www.tippmix.hu/sportfogadas')
 tippmix_page = BeautifulSoup(browser.page_source, 'lxml')
@@ -78,7 +76,22 @@ while len(tippmix_page.find("div", {'class': 'table-default'}).find('tbody').fin
 events = generate_list_of_events_from_page(tippmix_page)
 all_events.extend(events)
 
+next_button = tippmix_page.find('a', {'class': 'next'})
+
+while True:
+    next_button = browser.find_element(By.XPATH, '/html/body/div[2]/main/section/div/div[1]/div[1]/a[2]')
+    classes = next_button.get_attribute('class')
+    if 'pager-disabled' in classes:
+        break
+    else:
+        next_button.click()
+        browser.implicitly_wait(1)
+        tippmix_page = BeautifulSoup(browser.page_source, 'lxml')
+        events = generate_list_of_events_from_page(tippmix_page)
+        all_events.extend(events)
+
 for event in all_events:
     event.print_event()
+    print '===================='
 
-browser.close()
+print len(all_events)
